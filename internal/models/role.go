@@ -8,9 +8,9 @@ import (
 
 // Role represents the relationship between users and roles.
 type Role struct {
-	ID        int        `db:"id"`
-	Name      string     `db:"name"`
-	CreatedAt *time.Time `db:"created_at"`
+	ID        int       `db:"id"`
+	Name      string    `db:"name"`
+	CreatedAt time.Time `db:"created_at"`
 }
 
 // ToDTO converts a Role entity to a RoleDTO.

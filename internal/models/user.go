@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/it-gress/itg-go-template/internal/entities"
+	"github.com/it-gress/itg-go-template/internal/utils"
 )
 
 // User represents a user in the system.
@@ -16,8 +17,8 @@ type User struct {
 	LastLogin    *time.Time `db:"last_login"`
 	IsActive     bool       `db:"is_active"`
 	RoleID       int        `db:"role_id"`
-	UpdatedAt    *time.Time `db:"updated_at"`
-	CreatedAt    *time.Time `db:"created_at"`
+	UpdatedAt    time.Time  `db:"updated_at"`
+	CreatedAt    time.Time  `db:"created_at"`
 }
 
 // ToDTO converts a User entity to a UserDTO.
@@ -28,9 +29,9 @@ func (u *User) ToDTO() *entities.UserDTO {
 		Email:     u.Email,
 		Username:  u.Username,
 		RoleID:    u.RoleID,
-		LastLogin: u.LastLogin.Format(time.RFC3339),
+		LastLogin: utils.FormatTime(u.LastLogin),
 		IsActive:  u.IsActive,
-		CreatedAt: u.CreatedAt.Format(time.RFC3339),
-		UpdatedAt: u.UpdatedAt.Format(time.RFC3339),
+		CreatedAt: *utils.FormatTime(&u.CreatedAt),
+		UpdatedAt: *utils.FormatTime(&u.UpdatedAt),
 	}
 }

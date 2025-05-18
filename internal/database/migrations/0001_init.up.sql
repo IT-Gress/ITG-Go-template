@@ -1,14 +1,14 @@
 CREATE TABLE roles (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    created_at TIMESTAMPTZ
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE permissions (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     value VARCHAR(255) NOT NULL,
-    created_at TIMESTAMPTZ
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE role_permissions (
@@ -26,18 +26,18 @@ CREATE TABLE users (
     last_login TIMESTAMPTZ,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     role_id INT NOT NULL REFERENCES roles(id),
-    updated_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-INSERT INTO roles (name, description, created_at) VALUES
-('Admin', 'Administrator role with full access', NOW()),
-('User', 'Regular user role with limited access', NOW());
+INSERT INTO roles (name, created_at) VALUES
+('Admin', NOW()),
+('User', NOW());
 
-INSERT INTO permissions (name, description, value, created_at) VALUES
-('View users', 'Permission to view users', 'users.view', NOW()),
-('Edit users', 'Permission to edit users', 'users.edit', NOW()),
-('Create users', 'Permission to create users', 'users.create', NOW()),
+INSERT INTO permissions (name, value, created_at) VALUES
+('View users', 'users.read', NOW()),
+('Edit users', 'users.update', NOW()),
+('Create users', 'users.create', NOW());
 
 INSERT INTO role_permissions (role_id, permission_id) VALUES
 (1, 1),

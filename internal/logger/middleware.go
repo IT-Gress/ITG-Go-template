@@ -19,7 +19,7 @@ func GinSloggerMiddleware() gin.HandlerFunc {
 		path := c.Request.URL.Path
 		clientIP := c.ClientIP()
 		userID := c.GetInt("userID")
-		scope := c.GetStringSlice("scope")
+		scope := c.GetStringSlice("scopes")
 
 		level := getLogLevelForStatusCode(statusCode)
 
@@ -49,15 +49,10 @@ func getLogLevelForStatusCode(statusCode int) slog.Level {
 
 // GinDebugPrintRouteFunc is a custom function to print registered routes with slog.
 func GinDebugPrintRouteFunc(httpMethod, absolutePath, handlerName string, nuHandlers int) {
-	handlerFuncName := handlerName
-	if idx := len(handlerName) - 1; idx >= 0 {
-		handlerFuncName = handlerName[idx:]
-	}
-
 	slog.Debug("Registered route",
 		slog.String("method", httpMethod),
 		slog.String("path", absolutePath),
-		slog.String("handler", handlerFuncName),
+		slog.String("handler", handlerName),
 		slog.Int("num_handlers", nuHandlers),
 	)
 }

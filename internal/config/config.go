@@ -20,7 +20,7 @@ type Config struct {
 
 // Database holds the configuration for the PostgreSQL database connection.
 type Database struct {
-	User     string `envconfig:"POSTGRES_USERNAME" default:"postgres"`
+	User     string `envconfig:"POSTGRES_USERNAME"  default:"postgres"`
 	Password string `envconfig:"POSTGRES_PASSWORD" default:"postgres"`
 	Host     string `envconfig:"POSTGRES_HOST" default:"localhost"`
 	Port     int    `envconfig:"POSTGRES_PORT" default:"5432"`
@@ -48,8 +48,6 @@ func LoadConfiguration() (*Config, error) {
 	if err := envconfig.Process("", &cfg); err != nil {
 		return nil, err
 	}
-
-	slog.Debug("loaded configuration", slog.Any("config", cfg))
 
 	return &cfg, nil
 }

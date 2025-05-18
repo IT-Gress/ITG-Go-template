@@ -1,12 +1,13 @@
 package auth
 
 import (
-	"errors"
 	"log/slog"
+	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/it-gress/itg-go-template/internal/apierror"
 )
 
 // JWTPayload represents the structure of the JWT token payload.
@@ -16,10 +17,10 @@ type JWTPayload struct {
 }
 
 // GenerateToken creates a new JWT token for the given user ID and scopes.
-func GenerateToken(userID int, scopes []string) (string, error) {
+func GenerateToken(userID int, scopes []string) (string, *apierror.APIError) {
 	if jwtSecret == "" {
 		slog.Error("JWT not initialized")
-		return "", errors.New("JWT not initialized")
+		return "", apierror.New(http.StatusInternalServerError, "JWT not initialized", nil)
 	}
 
 	userIDStr := strconv.Itoa(userID)
@@ -34,42 +35,37 @@ func GenerateToken(userID int, scopes []string) (string, error) {
 	}).SignedString([]byte(jwtSecret))
 
 	if err != nil {
-		slog.Error(err.Error())
-		return "", err
+		return "", apierror.New(http.StatusInternalServerError, "Failed to generate token", err)
 	}
 
 	return token, nil
 }
 
 // ValidateToken checks if the token is valid and returns the claims if it is.
-func ValidateToken(tokenString string) (*JWTPayload, error) {
+func ValidateToken(tokenString string) (*JWTPayload, *apierror.APIError) {
 	if jwtSecret == "" {
-		slog.Error("JWT not initialized")
-		return nil, errors.New("JWT not initialized")
+		return nil, apierror.New(http.StatusInternalServerError, "JWT not initialized", nil)
 	}
 
 	token, err := jwt.ParseWithClaims(tokenString, &JWTPayload{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("unexpected signing method")
+			return nil, apierror.New(http.StatusUnauthorized, "unexpected signing method", nil)
 		}
 
 		return []byte(jwtSecret), nil
 	})
 
 	if err != nil {
-		slog.Error(err.Error())
-		return nil, err
+		return nil, apierror.New(http.StatusUnauthorized, "error decoding token", err)
 	}
 
 	claims, ok := token.Claims.(*JWTPayload)
 	if !ok {
-		slog.Error("invalid token claims")
-		return nil, errors.New("invalid token claims")
+		return nil, apierror.New(http.StatusUnauthorized, "invalid token claims", nil)
 	}
 
 	if !token.Valid {
-		slog.Error("invalid token")
-		return nil, errors.New("invalid token")
+		return nil, apierror.New(http.StatusUnauthorized, "invalid token", nil)
 	}
 
 	return claims, nil

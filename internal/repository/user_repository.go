@@ -26,12 +26,21 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 
 // InsertUser inserts a new user into the database.
 func (r *UserRepository) InsertUser(ctx context.Context, user *models.User) (*models.User, *apierror.APIError) {
-	query := `INSERT INTO users
-	(name, username, password_hash, email, role_id)
-	VALUES (:name, :username, :password_hash, :email, :role_id)
+	query := `
+	INSERT INTO users (
+		name, username, password_hash, email, role_id
+	)
+	VALUES (
+		:name, :username, :password_hash, :email, :role_id
+	)
 	RETURNING *`
 
-	err := r.DB.GetContext(ctx, user, query, user)
+	stmt, err := r.DB.PrepareNamedContext(ctx, query)
+	if err != nil {
+		return nil, apierror.New(http.StatusInternalServerError, "Failed to prepare query", err)
+	}
+
+	err = stmt.GetContext(ctx, user, user)
 	if err != nil {
 		if utils.IsUniqueViolation(err) {
 			return nil, apierror.New(http.StatusConflict, "User already exists", err)

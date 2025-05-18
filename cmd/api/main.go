@@ -32,12 +32,12 @@ func main() {
 	server := server.NewServer(cfg, handlers)
 	server.RegisterRoutes()
 
+	ensureDefaultUser(db)
+
 	if err := server.Start(); err != nil {
 		slog.Error("failed to start server", slog.Any("error", err))
 		panic(err)
 	}
-
-	ensureDefaultUser(db)
 }
 
 func mustLoadConfig() *config.Config {
@@ -68,5 +68,33 @@ func mustInitDatabase(cfg *config.Database) *sqlx.DB {
 }
 
 func ensureDefaultUser(db *sqlx.DB) {
+	// Check if there is atleast one user in the database
+	var count int
 
+	err := db.Get(&count, "SELECT COUNT(*) FROM users")
+	if err != nil {
+		slog.Error("failed to check user count", slog.Any("error", err))
+		panic(err)
+	}
+
+	if count > 0 {
+		slog.Debug("default user already exists")
+		return
+	}
+
+	passwordHash, hashErr := auth.CreateHash("admin")
+	if hashErr != nil {
+		slog.Error("failed to create password hash", slog.Any("error", hashErr))
+		panic(hashErr)
+	}
+
+	// Insert a default user
+	_, err = db.Exec("INSERT INTO users (name, username, password_hash, email, role_id) VALUES ($1, $2, $3, $4, $5)",
+		"Administrator", "admin", passwordHash, "admin@example.com", 1)
+	if err != nil {
+		slog.Error("failed to create default user", slog.Any("error", err))
+		panic(err)
+	}
+
+	slog.Info("default user created successfully", slog.String("username", "admin"), slog.String("password", "admin"))
 }

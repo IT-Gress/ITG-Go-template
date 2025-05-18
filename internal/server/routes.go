@@ -10,6 +10,10 @@ import (
 func (s *Server) RegisterRoutes() {
 	v1 := s.router.Group("/api/v1")
 
+	auth := v1.Group("/auth")
+	// /api/v1/auth
+	auth.POST("/login", s.handlers.UserHandler.HandleUserLogin)
+
 	users := v1.Group("/users", s.requireAuthentication)
 	// /api/v1/users
 	users.POST("/", s.requirePermissionsOrOwnResource("users.create"), s.handlers.UserHandler.HandleCreateUser)

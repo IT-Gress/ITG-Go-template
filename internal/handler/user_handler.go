@@ -66,6 +66,23 @@ func (h *UserHandler) HandleGetUserByID(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "User retrieved", user)
 }
 
+// HandleUserLogin handles the POST request for user login.
+func (h *UserHandler) HandleUserLogin(c *gin.Context) {
+	requestData, err := utils.GetDataFromRequest[entities.UserLoginRequest](c)
+	if err != nil {
+		utils.ErrorResponse(c, err)
+		return
+	}
+
+	responseData, err := h.UserController.UserLogin(c.Request.Context(), requestData)
+	if err != nil {
+		utils.ErrorResponse(c, err)
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusCreated, "User logged in", responseData)
+}
+
 // HandleUpdateUser handles the PUT request to update a user by ID.
 func (h *UserHandler) HandleUpdateUser(c *gin.Context) {
 	userID, err := utils.GetParamAsInt(c, "userID")

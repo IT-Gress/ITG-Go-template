@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/it-gress/itg-go-template/internal/apierror"
 	"github.com/it-gress/itg-go-template/internal/auth"
@@ -73,6 +74,47 @@ func (uc *UserController) GetUserByID(c context.Context, userID int) (*entities.
 	}
 
 	return user.ToDTO(), nil
+}
+
+// UserLogin handles user login by verifying the username and password.
+func (uc *UserController) UserLogin(
+	c context.Context,
+	userLoginRequest *entities.UserLoginRequest) (string, *apierror.APIError) {
+	// Find the user by username
+	user, err := uc.UserRepository.FindUserByUsername(c, userLoginRequest.Username)
+	if err != nil {
+		return "", err
+	}
+
+	// Check if the user is active
+	if !user.IsActive {
+		return "", apierror.New(http.StatusUnauthorized, "User is inactive", nil)
+	}
+
+	// Verify the password
+	if !auth.CompareHash(userLoginRequest.Password, user.PasswordHash) {
+		return "", apierror.New(http.StatusUnauthorized, "Invalid credentials", nil)
+	}
+
+	// Get the user's permissions
+	permissions, err := uc.UserRepository.FindPermissionsByUserID(c, user.ID)
+	if err != nil {
+		return "", err
+	}
+
+	// Convert permissions to scopes
+	scopes := make([]string, len(permissions))
+	for i, permission := range permissions {
+		scopes[i] = permission.Value
+	}
+
+	// Generate a JWT token
+	token, err := auth.GenerateToken(user.ID, scopes)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
 
 // UpdateUser updates an existing user in the repository and returns the updated user.

@@ -34,9 +34,9 @@ func (s *Server) requireAuthentication(c *gin.Context) {
 
 	c.Set("scopes", claims.Scopes)
 
-	userID, err := strconv.Atoi(claims.Subject)
-	if err != nil {
-		utils.ErrorResponse(c, apierror.New(http.StatusUnauthorized, "Invalid JWT Subject", err))
+	userID, convertErr := strconv.Atoi(claims.Subject)
+	if convertErr != nil {
+		utils.ErrorResponse(c, apierror.New(http.StatusUnauthorized, "Invalid JWT Subject", convertErr))
 		c.Abort()
 
 		return

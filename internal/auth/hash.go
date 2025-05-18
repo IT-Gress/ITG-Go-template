@@ -19,5 +19,5 @@ func CreateHash(password string) (string, *apierror.APIError) {
 
 // CompareHash compares the given password with the stored hash.
 func CompareHash(password string, hash string) bool {
-	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password+hashSalt)) != nil
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password+hashSalt)) == nil
 }
