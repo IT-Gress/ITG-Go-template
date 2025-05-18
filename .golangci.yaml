@@ -1,0 +1,84 @@
+version: '2'
+
+run:
+  go: '1.24'
+  timeout: 5m
+
+linters:
+  enable:
+    - bidichk
+    - bodyclose
+    - containedctx
+    - contextcheck
+    - dupl
+    - errcheck
+    - errname
+    - errorlint
+    - forbidigo
+    - funlen
+    - gocognit
+    - gocritic
+    - godot
+    - gosec
+    - misspell
+    - nakedret
+    - nestif
+    - noctx
+    - nolintlint
+    - prealloc
+    - predeclared
+    - reassign
+    - revive
+    - staticcheck
+    - thelper
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - wastedassign
+    - whitespace
+    - wsl
+    - funcorder
+  settings:
+    revive:
+      rules:
+        - name: exported
+        - name: var-naming
+        - name: indent-error-flow
+        - name: empty-block
+        - name: imports-blocklist
+          arguments: ['log']
+        - name: line-length-limit
+          arguments: [120]
+        - name: function-length
+          arguments: [50, 120]
+  exclusions:
+    generated: lax
+    presets:
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - ^(.*/)?mocks?/.*$
+      - third_party$
+      - builtin$
+      - examples$
+
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - goimports
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+      custom-order: true
+  exclusions:
+    generated: lax
+    paths:
+      - ^(.*/)?mocks?/.*$
+      - third_party$
+      - builtin$
+      - examples$

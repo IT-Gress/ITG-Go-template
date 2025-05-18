@@ -1,0 +1,40 @@
+services:
+  api:
+    build:
+      context: .
+    ports:
+      - '${PORT:-8080}:${PORT:-8080}'
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      PORT: ${PORT:-8080}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+      HASH_SALT: ${HASH_SALT:-thisisatestsalt}
+      SECRET: ${SECRET:-thisisatesecret}
+      POSTGRES_HOST: ${POSTGRES_HOST:-db}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_NAME: ${POSTGRES_DB:-api}
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16-alpine
+    container_name: db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-api}
+    ports:
+      - '5000:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${BLUEPRINT_DB_USERNAME} -d ${BLUEPRINT_DB_DATABASE}'"]
+      interval: 5s
+      timeout: 5s
+      retries: 4
+
+volumes:
+    postgres_data:
