@@ -8,6 +8,15 @@ import (
 
 // RegisterRoutes initializes the routes for the server.
 func (s *Server) RegisterRoutes() {
+	v1 := s.router.Group("/api/v1")
+
+	users := v1.Group("/users", s.requireAuthentication)
+	// /api/v1/users
+	users.POST("/", s.requirePermissionsOrOwnResource("users.create"), s.handlers.UserHandler.HandleCreateUser)
+	users.GET("/", s.requirePermissionsOrOwnResource("users.read"), s.handlers.UserHandler.HandleGetUsers)
+	users.GET("/:userID", s.requirePermissionsOrOwnResource("users.read"), s.handlers.UserHandler.HandleGetUserByID)
+	users.PUT("/:userID", s.requirePermissionsOrOwnResource("users.update"), s.handlers.UserHandler.HandleUpdateUser)
+
 	s.router.GET("/health", s.healthHandler)
 }
 

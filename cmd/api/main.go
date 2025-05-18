@@ -3,6 +3,7 @@ package main
 import (
 	"log/slog"
 
+	"github.com/it-gress/itg-go-template/internal/auth"
 	"github.com/it-gress/itg-go-template/internal/config"
 	"github.com/it-gress/itg-go-template/internal/controller"
 	"github.com/it-gress/itg-go-template/internal/database"
@@ -21,6 +22,7 @@ func main() {
 	cfg := mustLoadConfig()
 	logger.Init(cfg.LogLevel)
 
+	auth.Init(cfg.Secret, cfg.HashSalt)
 	db := mustInitDatabase(&cfg.Database)
 
 	repos := repository.NewRepositories(db)

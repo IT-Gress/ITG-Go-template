@@ -37,8 +37,10 @@ INSERT INTO roles (name, description, created_at) VALUES
 INSERT INTO permissions (name, description, value, created_at) VALUES
 ('View users', 'Permission to view users', 'users.view', NOW()),
 ('Edit users', 'Permission to edit users', 'users.edit', NOW()),
+('Create users', 'Permission to create users', 'users.create', NOW()),
 
 INSERT INTO role_permissions (role_id, permission_id) VALUES
 (1, 1),
 (1, 2),
+(1, 3),
 (2, 1);

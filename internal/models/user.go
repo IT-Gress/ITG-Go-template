@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/it-gress/itg-go-template/internal/entities"
+)
 
 // User represents a user in the system.
 type User struct {
@@ -16,17 +20,17 @@ type User struct {
 	CreatedAt    *time.Time `db:"created_at"`
 }
 
-// Role represents the relationship between users and roles.
-type Role struct {
-	ID        int        `db:"id"`
-	Name      string     `db:"name"`
-	CreatedAt *time.Time `db:"created_at"`
-}
-
-// Permission represents the relationship between users and roles.
-type Permission struct {
-	ID        int        `db:"id"`
-	Name      string     `db:"name"`
-	Value     string     `db:"value"`
-	CreatedAt *time.Time `db:"created_at"`
+// ToDTO converts a User entity to a UserDTO.
+func (u *User) ToDTO() *entities.UserDTO {
+	return &entities.UserDTO{
+		ID:        u.ID,
+		Name:      u.Name,
+		Email:     u.Email,
+		Username:  u.Username,
+		RoleID:    u.RoleID,
+		LastLogin: u.LastLogin.Format(time.RFC3339),
+		IsActive:  u.IsActive,
+		CreatedAt: u.CreatedAt.Format(time.RFC3339),
+		UpdatedAt: u.UpdatedAt.Format(time.RFC3339),
+	}
 }
