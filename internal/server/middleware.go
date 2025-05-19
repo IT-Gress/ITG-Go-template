@@ -1,10 +1,12 @@
 package server
 
 import (
+	"log/slog"
 	"net/http"
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/it-gress/itg-go-template/internal/apierror"
@@ -80,4 +82,44 @@ func extractToken(c *gin.Context) string {
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 
 	return token
+}
+
+// ginSloggerMiddleware is the middleware that logs request details, userID, scope, and log levels.
+func ginSloggerMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		start := time.Now()
+
+		c.Next()
+
+		latency := time.Since(start).Milliseconds()
+		statusCode := c.Writer.Status()
+		path := c.Request.URL.Path
+		clientIP := c.ClientIP()
+		userID := c.GetInt("userID")
+		scope := c.GetStringSlice("scopes")
+
+		level := getLogLevelForStatusCode(statusCode)
+
+		attrs := []slog.Attr{
+			slog.Int("status", statusCode),
+			slog.String("method", c.Request.Method),
+			slog.String("path", path),
+			slog.String("ip", clientIP),
+			slog.Int64("latency", latency),
+			slog.Int("user_id", userID),
+			slog.Any("scope", scope),
+		}
+
+		slog.LogAttrs(c.Request.Context(), level, "Request processed", attrs...)
+	}
+}
+
+func getLogLevelForStatusCode(statusCode int) slog.Level {
+	if statusCode >= 500 {
+		return slog.LevelError
+	} else if statusCode >= 400 {
+		return slog.LevelWarn
+	}
+
+	return slog.LevelInfo
 }

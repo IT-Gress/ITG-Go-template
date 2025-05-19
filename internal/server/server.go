@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/it-gress/itg-go-template/internal/config"
 	"github.com/it-gress/itg-go-template/internal/handler"
-	"github.com/it-gress/itg-go-template/internal/logger"
 )
 
 // Server is a struct that holds the configuration, handlers, and router for the server.
@@ -20,8 +19,8 @@ type Server struct {
 
 // NewServer initializes a new Server with the given configuration and handlers.
 func NewServer(cfg *config.Config, handlers *handler.Handlers) *Server {
-	gin.DebugPrintRouteFunc = logger.GinDebugPrintRouteFunc
-	gin.DebugPrintFunc = logger.GinDebugPrintFunc
+	gin.DebugPrintRouteFunc = ginDebugPrintRouteFunc
+	gin.DebugPrintFunc = ginDebugPrintFunc
 
 	if cfg.Environment == "production" {
 		slog.Info("Running gin in production mode")
@@ -33,7 +32,7 @@ func NewServer(cfg *config.Config, handlers *handler.Handlers) *Server {
 
 	r := gin.New()
 
-	r.Use(logger.GinSloggerMiddleware())
+	r.Use(ginSloggerMiddleware())
 	r.Use(gin.Recovery())
 	r.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
@@ -57,4 +56,22 @@ func (s *Server) Start() error {
 	slog.Info("Server started successfully", slog.Int("port", s.cfg.Port))
 
 	return nil
+}
+
+// ginDebugPrintRouteFunc is a custom function to print registered routes with slog.
+func ginDebugPrintRouteFunc(httpMethod, absolutePath, handlerName string, nuHandlers int) {
+	slog.Debug("Registered route",
+		slog.String("method", httpMethod),
+		slog.String("path", absolutePath),
+		slog.String("handler", handlerName),
+		slog.Int("num_handlers", nuHandlers),
+	)
+}
+
+// ginDebugPrintFunc is a custom debug print function for Gin.
+func ginDebugPrintFunc(format string, values ...any) {
+	slog.Debug("Debug print",
+		slog.String("format", format),
+		slog.Any("values", values),
+	)
 }
