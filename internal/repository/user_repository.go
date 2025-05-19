@@ -132,7 +132,7 @@ func (r *UserRepository) UpdateUser(ctx context.Context, user *models.User) (*mo
 	_, err := r.DB.NamedExecContext(ctx, query, user)
 	if err != nil {
 		if utils.IsUniqueViolation(err) {
-			return nil, apierror.New(http.StatusConflict, "User already exists", err)
+			return nil, apierror.New(http.StatusConflict, "User with this username or email already exists", err)
 		}
 
 		return nil, apierror.New(http.StatusInternalServerError, "Failed to update user", err)
