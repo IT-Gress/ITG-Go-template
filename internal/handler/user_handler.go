@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/it-gress/itg-go-template/internal/controller"
-	"github.com/it-gress/itg-go-template/internal/entities"
+	"github.com/it-gress/itg-go-template/internal/entity"
 	"github.com/it-gress/itg-go-template/internal/utils"
 )
 
@@ -23,7 +23,7 @@ func NewUserHandler(userController *controller.UserController) *UserHandler {
 
 // HandleCreateUser handles the creation of a new user.
 func (h *UserHandler) HandleCreateUser(c *gin.Context) {
-	requestData, err := utils.GetDataFromRequest[entities.CreateUserRequest](c)
+	requestData, err := utils.GetDataFromRequest[entity.CreateUserRequest](c)
 	if err != nil {
 		utils.ErrorResponse(c, err)
 		return
@@ -68,7 +68,7 @@ func (h *UserHandler) HandleGetUserByID(c *gin.Context) {
 
 // HandleUserLogin handles the POST request for user login.
 func (h *UserHandler) HandleUserLogin(c *gin.Context) {
-	requestData, err := utils.GetDataFromRequest[entities.UserLoginRequest](c)
+	requestData, err := utils.GetDataFromRequest[entity.UserLoginRequest](c)
 	if err != nil {
 		utils.ErrorResponse(c, err)
 		return
@@ -91,7 +91,7 @@ func (h *UserHandler) HandleUpdateUser(c *gin.Context) {
 		return
 	}
 
-	requestData, err := utils.GetDataFromRequest[entities.UpdateUserRequest](c)
+	requestData, err := utils.GetDataFromRequest[entity.UpdateUserRequest](c)
 	if err != nil {
 		utils.ErrorResponse(c, err)
 		return

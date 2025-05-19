@@ -1,4 +1,4 @@
-package entities
+package entity
 
 // UserDTO is a struct that represents a user data transfer object.
 type UserDTO struct {

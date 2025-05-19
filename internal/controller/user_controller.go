@@ -7,7 +7,7 @@ import (
 
 	"github.com/it-gress/itg-go-template/internal/apierror"
 	"github.com/it-gress/itg-go-template/internal/auth"
-	"github.com/it-gress/itg-go-template/internal/entities"
+	"github.com/it-gress/itg-go-template/internal/entity"
 	"github.com/it-gress/itg-go-template/internal/models"
 	"github.com/it-gress/itg-go-template/internal/repository"
 )
@@ -26,7 +26,7 @@ func NewUserController(userRepository *repository.UserRepository) *UserControlle
 
 // CreateUser creates a new user in the repository and returns the created user.
 func (uc *UserController) CreateUser(
-	c context.Context, createUserRequest *entities.CreateUserRequest) (*entities.UserDTO, *apierror.APIError) {
+	c context.Context, createUserRequest *entity.CreateUserRequest) (*entity.UserDTO, *apierror.APIError) {
 	// Convert CreateUserRequest to User entity
 	newUser := &models.User{
 		Name:     createUserRequest.Name,
@@ -52,13 +52,13 @@ func (uc *UserController) CreateUser(
 }
 
 // GetUsers retrieves all users from the repository and converts them to UserDTOs.
-func (uc *UserController) GetUsers(c context.Context) ([]*entities.UserDTO, *apierror.APIError) {
+func (uc *UserController) GetUsers(c context.Context) ([]*entity.UserDTO, *apierror.APIError) {
 	users, err := uc.UserRepository.FindAllUsers(c)
 	if err != nil {
 		return nil, err
 	}
 
-	userDTOs := make([]*entities.UserDTO, len(users))
+	userDTOs := make([]*entity.UserDTO, len(users))
 
 	for i, user := range users {
 		userDTOs[i] = user.ToDTO()
@@ -68,7 +68,7 @@ func (uc *UserController) GetUsers(c context.Context) ([]*entities.UserDTO, *api
 }
 
 // GetUserByID retrieves a user by their ID from the repository and converts it to a UserDTO.
-func (uc *UserController) GetUserByID(c context.Context, userID int) (*entities.UserDTO, *apierror.APIError) {
+func (uc *UserController) GetUserByID(c context.Context, userID int) (*entity.UserDTO, *apierror.APIError) {
 	user, err := uc.UserRepository.FindUserByID(c, userID)
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (uc *UserController) GetUserByID(c context.Context, userID int) (*entities.
 // UserLogin handles user login by verifying the username and password.
 func (uc *UserController) UserLogin(
 	c context.Context,
-	userLoginRequest *entities.UserLoginRequest) (string, *apierror.APIError) {
+	userLoginRequest *entity.UserLoginRequest) (string, *apierror.APIError) {
 	// Find the user by username
 	user, err := uc.UserRepository.FindUserByUsername(c, userLoginRequest.Username)
 	if err != nil {
@@ -131,7 +131,7 @@ func (uc *UserController) UserLogin(
 func (uc *UserController) UpdateUser(
 	c context.Context,
 	userID int,
-	updateUserRequest *entities.UpdateUserRequest) (*entities.UserDTO, *apierror.APIError) {
+	updateUserRequest *entity.UpdateUserRequest) (*entity.UserDTO, *apierror.APIError) {
 	// Find the user by ID
 	user, err := uc.UserRepository.FindUserByID(c, userID)
 	if err != nil {

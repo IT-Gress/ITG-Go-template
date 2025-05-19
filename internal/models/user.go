@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/it-gress/itg-go-template/internal/entities"
+	"github.com/it-gress/itg-go-template/internal/entity"
 	"github.com/it-gress/itg-go-template/internal/utils"
 )
 
@@ -22,8 +22,8 @@ type User struct {
 }
 
 // ToDTO converts a User entity to a UserDTO.
-func (u *User) ToDTO() *entities.UserDTO {
-	return &entities.UserDTO{
+func (u *User) ToDTO() *entity.UserDTO {
+	return &entity.UserDTO{
 		ID:        u.ID,
 		Name:      u.Name,
 		Email:     u.Email,

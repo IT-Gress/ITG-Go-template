@@ -1,4 +1,4 @@
-package entities
+package entity
 
 // PermissionDTO is a struct that represents a permission data transfer object.
 type PermissionDTO struct {

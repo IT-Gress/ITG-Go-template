@@ -96,7 +96,7 @@ func ginSloggerMiddleware() gin.HandlerFunc {
 		path := c.Request.URL.Path
 		clientIP := c.ClientIP()
 		userID := c.GetInt("userID")
-		scope := c.GetStringSlice("scopes")
+		scopes := c.GetStringSlice("scopes")
 
 		level := getLogLevelForStatusCode(statusCode)
 
@@ -107,7 +107,7 @@ func ginSloggerMiddleware() gin.HandlerFunc {
 			slog.String("ip", clientIP),
 			slog.Int64("latency", latency),
 			slog.Int("user_id", userID),
-			slog.Any("scope", scope),
+			slog.Any("scope", scopes),
 		}
 
 		slog.LogAttrs(c.Request.Context(), level, "Request processed", attrs...)
