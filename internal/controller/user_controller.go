@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/it-gress/itg-go-template/internal/apierror"
 	"github.com/it-gress/itg-go-template/internal/auth"
@@ -110,6 +111,15 @@ func (uc *UserController) UserLogin(
 
 	// Generate a JWT token
 	token, err := auth.GenerateToken(user.ID, scopes)
+	if err != nil {
+		return "", err
+	}
+
+	// Update the user's last login time
+	now := time.Now()
+	user.LastLogin = &now
+
+	_, err = uc.UserRepository.UpdateUser(c, user)
 	if err != nil {
 		return "", err
 	}
