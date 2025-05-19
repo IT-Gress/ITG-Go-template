@@ -15,25 +15,25 @@ type UserDTO struct {
 
 // CreateUserRequest is a struct that represents a request to create a new user.
 type CreateUserRequest struct {
-	Name     string `json:"name" validate:"required"`
-	Email    string `json:"email" validate:"required,email"`
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
-	RoleID   int    `json:"role_id" validate:"required"`
+	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	RoleID   int    `json:"role_id" binding:"required"`
 }
 
 // UpdateUserRequest is a struct that represents a request to update an existing user.
 type UpdateUserRequest struct {
-	Name     string  `json:"name" validate:"required"`
-	Email    string  `json:"email" validate:"required,email"`
-	Username string  `json:"username" validate:"required"`
+	Name     string  `json:"name" binding:"required"`
+	Email    string  `json:"email" binding:"required,email"`
+	Username string  `json:"username" binding:"required"`
 	Password *string `json:"password"`
-	RoleID   int     `json:"role_id" validate:"required"`
-	IsActive bool    `json:"is_active" validate:"required"`
+	RoleID   int     `json:"role_id" binding:"required"`
+	IsActive bool    `json:"is_active" binding:"required"`
 }
 
 // UserLoginRequest is a struct that represents a request to log in a user.
 type UserLoginRequest struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
