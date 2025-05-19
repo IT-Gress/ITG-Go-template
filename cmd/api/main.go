@@ -78,11 +78,14 @@ func ensureDefaultUser(db *sqlx.DB) {
 	}
 
 	if count > 0 {
-		slog.Debug("default user already exists")
+		slog.Debug("a user already exists, skipping default user creation")
 		return
 	}
 
-	passwordHash, hashErr := auth.CreateHash("admin")
+	password := "admin"
+	username := "admin"
+
+	passwordHash, hashErr := auth.CreateHash(password)
 	if hashErr != nil {
 		slog.Error("failed to create password hash", slog.Any("error", hashErr))
 		panic(hashErr)
@@ -90,11 +93,11 @@ func ensureDefaultUser(db *sqlx.DB) {
 
 	// Insert a default user
 	_, err = db.Exec("INSERT INTO users (name, username, password_hash, email, role_id) VALUES ($1, $2, $3, $4, $5)",
-		"Administrator", "admin", passwordHash, "admin@example.com", 1)
+		"Administrator", username, passwordHash, "admin@example.com", 1)
 	if err != nil {
 		slog.Error("failed to create default user", slog.Any("error", err))
 		panic(err)
 	}
 
-	slog.Info("default user created successfully", slog.String("username", "admin"), slog.String("password", "admin"))
+	slog.Info("default user created successfully", slog.String("username", username), slog.String("password", password))
 }
