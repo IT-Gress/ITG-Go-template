@@ -14,6 +14,10 @@ import (
 	"github.com/it-gress/itg-go-template/internal/utils"
 )
 
+const authHeaderKey = "Authorization"
+const localsUserIDKey = "userID"
+const localsScopesKey = "scopes"
+
 func (s *Server) requireAuthentication(c *gin.Context) {
 	// Get jwt from request haeder
 	token := extractToken(c)
@@ -34,7 +38,7 @@ func (s *Server) requireAuthentication(c *gin.Context) {
 		return
 	}
 
-	c.Set("scopes", claims.Scopes)
+	c.Set(localsScopesKey, claims.Scopes)
 
 	userID, convertErr := strconv.Atoi(claims.Subject)
 	if convertErr != nil {
@@ -44,7 +48,7 @@ func (s *Server) requireAuthentication(c *gin.Context) {
 		return
 	}
 
-	c.Set("userID", userID)
+	c.Set(localsUserIDKey, userID)
 
 	c.Next()
 }
@@ -53,13 +57,13 @@ func (s *Server) requirePermissionsOrOwnResource(permission string) gin.HandlerF
 	return func(c *gin.Context) {
 		// Check if the user owns the resource
 		userID, _ := utils.GetParamAsInt(c, "userID")
-		if userID == c.GetInt("userID") && userID != 0 {
+		if userID == c.GetInt(localsUserIDKey) && userID != 0 {
 			c.Next()
 			return
 		}
 
 		// Get the scopes from the context
-		scopes := c.GetStringSlice("scopes")
+		scopes := c.GetStringSlice(localsScopesKey)
 
 		// Check if the required permission is in auth scopes
 		if !slices.Contains(scopes, permission) {
@@ -74,7 +78,7 @@ func (s *Server) requirePermissionsOrOwnResource(permission string) gin.HandlerF
 }
 
 func extractToken(c *gin.Context) string {
-	authHeader := c.GetHeader("Authorization")
+	authHeader := c.GetHeader(authHeaderKey)
 	if authHeader == "" {
 		return ""
 	}
@@ -95,8 +99,8 @@ func ginSloggerMiddleware() gin.HandlerFunc {
 		statusCode := c.Writer.Status()
 		path := c.Request.URL.Path
 		clientIP := c.ClientIP()
-		userID := c.GetInt("userID")
-		scopes := c.GetStringSlice("scopes")
+		userID := c.GetInt(localsUserIDKey)
+		scopes := c.GetStringSlice(localsScopesKey)
 
 		level := getLogLevelForStatusCode(statusCode)
 
